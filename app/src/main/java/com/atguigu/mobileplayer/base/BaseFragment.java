@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,7 @@ public abstract class BaseFragment extends Fragment {
      * 初始化数据
      * 联网请求数据
      * 绑定数据
+     *
      * @param savedInstanceState
      */
     @Override
@@ -63,7 +65,29 @@ public abstract class BaseFragment extends Fragment {
         initData();
     }
 
-    public  void initData(){
+    public void initData() {
 
     }
+
+    /**
+     * @param hidden
+     * false：当前类显示
+     * true:当前类隐藏
+     */
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        Log.e("TAG", "onHiddenChanged。。" + this.toString() + ",hidden==" + hidden);
+        if (!hidden) {
+            onRefrshData();
+        }
+    }
+
+    /**
+     * 当子类要刷新数据的时候重写该方法
+     */
+    public void onRefrshData() {
+
+    }
+
 }
