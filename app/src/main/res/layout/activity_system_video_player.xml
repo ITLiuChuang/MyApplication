@@ -9,8 +9,9 @@
     android:gravity="center"
     tools:context="com.atguigu.mobileplayer.activity.SystemVideoPlayerActivity">
 
-    <VideoView
+    <com.atguigu.mobileplayer.view.VideoView
         android:id="@+id/videoview"
+        android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

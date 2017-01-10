@@ -1,10 +1,12 @@
 package com.atguigu.mobileplayer.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by 刘闯 on 2017/1/9.
  */
 
-public class MediaItem {
+public class MediaItem implements Serializable{
     String name;
     long duration;
     long size;
