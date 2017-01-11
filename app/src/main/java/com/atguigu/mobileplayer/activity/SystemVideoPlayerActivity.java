@@ -57,6 +57,10 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
      * 隐藏控制面板
      */
     private static final int HIDE_MEDIA_CONTROLLER = 1;
+    /**
+     * 显示网络速度
+     */
+    private static final int SHOW_NET_SPEED = 3;
     private LinearLayout llTop;
     private TextView tvName;
     private ImageView ivBattery;
@@ -177,6 +181,8 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         //和SeekBar关联
         seekbarVoice.setMax(maxVolme);
         seekbarVoice.setProgress(currentVolume);
+        //发消息
+        handler.sendEmptyMessage(SHOW_NET_SPEED);
     }
 
 
@@ -189,9 +195,9 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.e(TAG, "onCreate");
+        initData();
         findViews();
         getData();
-        initData();
         //设置视频加载的监听
         setLinstener();
         setData();
@@ -313,6 +319,15 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case SHOW_NET_SPEED:
+                    String netSpeed = utils.showNetSpeed(SystemVideoPlayerActivity.this);
+                    //不为空
+                    tv_loading.setText("正在加载...." + netSpeed);
+                    tv_buffer.setText("缓存中...." + netSpeed);
+
+                    removeMessages(SHOW_NET_SPEED);
+                    sendEmptyMessageDelayed(SHOW_NET_SPEED,1000);
+                    break;
                 case HIDE_MEDIA_CONTROLLER:
                     //隐藏控制面板
                     hideMediaController();
@@ -336,10 +351,10 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
 
                         int buffer = currentPosition - prePosition;
                         //一秒之内播放的进度小于500毫秒就是卡了，否则不卡
-                        if(buffer<500) {
+                        if (buffer < 500) {
                             //显示缓存
                             ll_buffer.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             //隐藏缓存
                             ll_buffer.setVisibility(View.GONE);
                         }
