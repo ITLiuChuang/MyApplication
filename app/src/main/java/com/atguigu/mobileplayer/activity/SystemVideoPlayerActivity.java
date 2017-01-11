@@ -75,6 +75,8 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
     private Button btuSwichScreen;
     private TextView tv_loading;
     private LinearLayout ll_loading;
+    private TextView tv_buffer;
+    private LinearLayout ll_buffer;
 
     private Utils utils;
     private MyBroadcastReceiver receiver;
@@ -153,6 +155,8 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         btuSwichScreen = (Button) findViewById(R.id.btu_swich_screen);
         ll_loading = (LinearLayout) findViewById(R.id.ll_loading);
         tv_loading = (TextView) findViewById(R.id.tv_loading);
+        ll_buffer = (LinearLayout) findViewById(R.id.ll_buffer);
+        tv_buffer = (TextView) findViewById(R.id.tv_buffer);
 
         btnVoice.setOnClickListener(this);
         btnSwichePlayer.setOnClickListener(this);
@@ -303,6 +307,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         llBottom.setVisibility(View.GONE);
     }
 
+    private int prePosition;
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -321,11 +326,24 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
                     tvSystetime.setText(getSystemTime());
 
                     //设置视频缓存经度更新
-                    if(isNetUrl) {
+                    if (isNetUrl) {
                         int buffer = videoview.getBufferPercentage();
                         //缓存进度
-                        int secondaryProgress = buffer*seekBarVideo.getMax();
+                        int secondaryProgress = buffer * seekBarVideo.getMax();
                         seekBarVideo.setSecondaryProgress(secondaryProgress);
+                    }
+                    if (isNetUrl && videoview.isPlaying()) {
+
+                        int buffer = currentPosition - prePosition;
+                        //一秒之内播放的进度小于500毫秒就是卡了，否则不卡
+                        if(buffer<500) {
+                            //显示缓存
+                            ll_buffer.setVisibility(View.VISIBLE);
+                        }else{
+                            //隐藏缓存
+                            ll_buffer.setVisibility(View.GONE);
+                        }
+                        prePosition = currentPosition;
                     }
                     //不断发送消息
                     removeMessages(PROGRESS);
