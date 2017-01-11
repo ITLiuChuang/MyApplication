@@ -73,6 +73,9 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
     private Button btuStartPause;
     private Button btuNext;
     private Button btuSwichScreen;
+    private TextView tv_loading;
+    private LinearLayout ll_loading;
+
     private Utils utils;
     private MyBroadcastReceiver receiver;
     private float startY;
@@ -118,6 +121,10 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
      * 是否静音
      */
     private boolean isMute = false;
+    /**
+     * 是否网络视频
+     */
+    private boolean isNetUrl;
 
     /**
      * Find the Views in the layout<br />
@@ -144,6 +151,8 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         btuStartPause = (Button) findViewById(R.id.btu_start_pause);
         btuNext = (Button) findViewById(R.id.btu_next);
         btuSwichScreen = (Button) findViewById(R.id.btu_swich_screen);
+        ll_loading = (LinearLayout) findViewById(R.id.ll_loading);
+        tv_loading = (TextView) findViewById(R.id.tv_loading);
 
         btnVoice.setOnClickListener(this);
         btnSwichePlayer.setOnClickListener(this);
@@ -158,8 +167,8 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
 
         //获取音频的最大值15,当前值
         am = (AudioManager) getSystemService(AUDIO_SERVICE);
-        currentVolume = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        maxVolme = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        currentVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+        maxVolme = am.getStreamVolume(AudioManager.STREAM_MUSIC);
 
         //和SeekBar关联
         seekbarVoice.setMax(maxVolme);
@@ -182,6 +191,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         //设置视频加载的监听
         setLinstener();
         setData();
+        checkButtonStatus();
     }
 
     private void initData() {
@@ -309,6 +319,14 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
 
                     //得到系统的时间并且更新
                     tvSystetime.setText(getSystemTime());
+
+                    //设置视频缓存经度更新
+                    if(isNetUrl) {
+                        int buffer = videoview.getBufferPercentage();
+                        //缓存进度
+                        int secondaryProgress = buffer*seekBarVideo.getMax();
+                        seekBarVideo.setSecondaryProgress(secondaryProgress);
+                    }
                     //不断发送消息
                     removeMessages(PROGRESS);
                     sendEmptyMessageDelayed(PROGRESS, 1000);
@@ -330,7 +348,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
     }
 
     /**
-     * 设置电量
+     * 设置电量     *
      *
      * @param level
      */
@@ -375,6 +393,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         } else if (v == btnSwichePlayer) {
             // Handle clicks for btnSwichePlayer
         } else if (v == btuExit) {
+            finish();
             // Handle clicks for btuExit
         } else if (v == btuPre) {//上一个点击事件
             setPreVideo();
@@ -409,12 +428,12 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
              */
             am.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
             seekbarVoice.setProgress(0);
-            if (progress <= 0) {
+           /* if (progress <= 0) {
                 //设置静音
                 isMute = true;
             }else{
                 isMute = false;
-            }
+            }*/
         } else {
             am.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
             seekbarVoice.setProgress(progress);
@@ -487,10 +506,12 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
             MediaItem mediaItem = mediaItems.get(position);
             videoview.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
+            isNetUrl = utils.isNetUrl(mediaItem.getData());
         } else if (uri != null) {
             //设置播放地址
             videoview.setVideoURI(uri);
             tvName.setText(uri.toString());
+            isNetUrl = utils.isNetUrl(uri.toString());
         }
 
     }
@@ -609,12 +630,17 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         if (mediaItems != null && mediaItems.size() > 0) {
             position--;
             if (position >= 0) {
+                //显示加载页面
+                ll_loading.setVisibility(View.VISIBLE);
+
                 MediaItem mediaItem = mediaItems.get(position);
                 //设置标题
                 tvName.setText(mediaItem.getName());
+
+                isNetUrl = utils.isNetUrl(mediaItem.getData());
                 //设置播放地址
                 videoview.setVideoPath(mediaItem.getData());
-                //校验2按钮状态
+                //校验按钮状态
                 checkButtonStatus();
             } else {
                 //越界
@@ -631,9 +657,12 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         if (mediaItems != null && mediaItems.size() > 0) {
             position++;
             if (position < mediaItems.size()) {
+                //显示加载页面
+                ll_loading.setVisibility(View.VISIBLE);
                 MediaItem mediaItem = mediaItems.get(position);
                 //设置标题
                 tvName.setText(mediaItem.getName());
+                isNetUrl = utils.isNetUrl(mediaItem.getData());
                 //设置播放地址
                 videoview.setVideoPath(mediaItem.getData());
                 //主题的校验
@@ -678,7 +707,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
     }
 
     /**
-     * 设置按钮的课点击状态
+     * 设置按钮的点击状态
      *
      * @param isEnable
      */
@@ -700,7 +729,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
             Toast.makeText(SystemVideoPlayerActivity.this, "播放出错了，亲", Toast.LENGTH_SHORT).show();
-            return false;
+            return true;
         }
     }
 
@@ -730,6 +759,8 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
 
             //发消息
             handler.sendEmptyMessage(PROGRESS);
+            //隐藏加载等待页面
+            ll_loading.setVisibility(View.GONE);
         }
     }
 
@@ -740,9 +771,10 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             //1.按下记录起始坐标
             startY = event.getY();
+
             // 2.记录最大的滑动区域（屏幕的高），当前的音量
             touchRang = Math.min(screeHeight, screenWidth);
-            mVol = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
             //移除消息
             handler.removeMessages(HIDE_MEDIA_CONTROLLER);
             return true;
@@ -757,6 +789,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
             // 设置的声音  = 原来记录的 + 改变的声音
             int volue = (int) Math.min(Math.max(delta + mVol, 0), maxVolme);
             if (delta != 0) {
+                Log.e("TAG", volue + "");
                 updataVoiceProgress(volue);
             }
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -778,23 +811,23 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             //改变音量
             currentVolume--;
             updataVoiceProgress(currentVolume);
             //移除消息
             handler.removeMessages(HIDE_MEDIA_CONTROLLER);
             //发消息
-            handler.sendEmptyMessageDelayed(HIDE_MEDIA_CONTROLLER,4000);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIA_CONTROLLER, 4000);
             return true;
-        }else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             //改变音量
             currentVolume++;
             updataVoiceProgress(currentVolume);
             //移除消息
             handler.removeMessages(HIDE_MEDIA_CONTROLLER);
             //发消息
-            handler.sendEmptyMessageDelayed(HIDE_MEDIA_CONTROLLER,4000);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIA_CONTROLLER, 4000);
 
         }
         return super.onKeyDown(keyCode, event);

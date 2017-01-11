@@ -135,30 +135,35 @@
                 android:id="@+id/btu_exit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/btn_exit_selector" />
 
             <Button
                 android:id="@+id/btu_pre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/btn_pre_selector" />
 
             <Button
                 android:id="@+id/btu_start_pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/btn_pause_selector" />
 
             <Button
                 android:id="@+id/btu_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/btn_next_selector" />
 
             <Button
                 android:id="@+id/btu_swich_screen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/btn_screen_full_selector" />
 
         </LinearLayout>

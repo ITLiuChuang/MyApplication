@@ -41,4 +41,13 @@ public class Utils {
         }
     }
 
+    public boolean isNetUrl(String data) {
+        boolean ressult = false;
+        if (data != null) {
+            if (data.toLowerCase().startsWith("http") || data.toLowerCase().startsWith("rtsp") || data.toLowerCase().startsWith("mms")) {
+                ressult = true;
+            }
+        }
+        return ressult;
+    }
 }
