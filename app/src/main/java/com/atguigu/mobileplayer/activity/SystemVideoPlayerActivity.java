@@ -1,8 +1,10 @@
 package com.atguigu.mobileplayer.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
@@ -425,6 +427,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
             }
         } else if (v == btnSwichePlayer) {
             // Handle clicks for btnSwichePlayer
+            showSwichePlayerDiaog();
         } else if (v == btuExit) {
             finish();
             // Handle clicks for btuExit
@@ -451,6 +454,26 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
         //重新发消息
         handler.sendEmptyMessageDelayed(HIDE_MEDIA_CONTROLLER, 4000);
     }
+
+    private void showSwichePlayerDiaog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("提醒");
+        builder.setMessage("当前播放使用系统播放器播放，当播放出现有声音没有画面的时候，请切换万能播放器");
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                startVitamioVideoPlayer();
+            }
+        });
+        builder.show();
+    }
+
 
     private void updataVoiceProgress(int progress) {
         if (isMute) {
@@ -786,7 +809,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
             intent.putExtra("position", position);
 
         } else if (uri != null) {
-            intent.setDataAndType(uri,"video/*");
+            intent.setDataAndType(uri, "video/*");
         }
         startActivity(intent);
         finish();
@@ -821,6 +844,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
             //隐藏加载等待页面
             ll_loading.setVisibility(View.GONE);
         }
+
     }
 
     @Override
