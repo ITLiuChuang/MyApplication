@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.atguigu.mobileplayer.R;
 import com.atguigu.mobileplayer.activity.SystemVideoPlayerActivity;
@@ -14,6 +15,8 @@ import com.atguigu.mobileplayer.adapter.NetVideoAdapter;
 import com.atguigu.mobileplayer.base.BaseFragment;
 import com.atguigu.mobileplayer.bean.MediaItem;
 import com.atguigu.mobileplayer.utils.Constant;
+import com.cjj.MaterialRefreshLayout;
+import com.cjj.MaterialRefreshListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,6 +46,8 @@ public class NetVideoFragment extends BaseFragment {
     private ListView listView;
     @ViewInject(R.id.tv_no_media)
     private TextView tv_no_media;
+    @ViewInject(R.id.refresh)
+    MaterialRefreshLayout refreshLayout;
 
     @Override
     public View initView() {
@@ -52,7 +57,21 @@ public class NetVideoFragment extends BaseFragment {
         x.view().inject(NetVideoFragment.this, view);
         //才初始化好的
         listView.setOnItemClickListener(new MyOnItemClickListener());
+        refreshLayout.setMaterialRefreshListener(new MyMaterialRefreshListener());
         return view;
+    }
+    class MyMaterialRefreshListener extends MaterialRefreshListener {
+
+        @Override
+        public void onRefresh(MaterialRefreshLayout materialRefreshLayout) {
+            getDataFromNet();
+        }
+
+        @Override
+        public void onRefreshLoadMore(MaterialRefreshLayout materialRefreshLayout) {
+            super.onRefreshLoadMore(materialRefreshLayout);
+            Toast.makeText(mContext, "加载更多", Toast.LENGTH_SHORT).show();
+        }
     }
 
     class MyOnItemClickListener implements AdapterView.OnItemClickListener {
@@ -77,7 +96,7 @@ public class NetVideoFragment extends BaseFragment {
     public void initData() {
         super.initData();
         Log.e("TAG", "网络视频数据初始化了");
-       // String json = CacheUtils.getString(mContext,Constant.NET_URL);
+        // String json = CacheUtils.getString(mContext,Constant.NET_URL);
         getDataFromNet();
     }
 
@@ -92,8 +111,10 @@ public class NetVideoFragment extends BaseFragment {
             public void onSuccess(String result) {
                 Log.e("TAG", "xUtils3联网请求成功==");
                 Log.e("TAG", "线程名称==" + Thread.currentThread().getName());
-              //  CacheUtils.putString(mContext,Constant.NET_URL,result);
+                //  CacheUtils.putString(mContext,Constant.NET_URL,result);
                 processData(result);
+                //完成刷新
+                refreshLayout.finishRefresh();
             }
 
             @Override
@@ -126,9 +147,9 @@ public class NetVideoFragment extends BaseFragment {
         if (mediaItems != null && mediaItems.size() > 0) {
             //有数据
             tv_no_media.setVisibility(View.GONE);
-            adapter = new NetVideoAdapter(mContext,mediaItems);
+            adapter = new NetVideoAdapter(mContext, mediaItems);
             listView.setAdapter(adapter);
-        }else {
+        } else {
             tv_no_media.setVisibility(View.VISIBLE);
         }
     }
