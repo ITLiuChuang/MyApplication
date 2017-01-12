@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/Android-MaterialRefreshLayout-master/Android-MaterialRefreshLayout-master.iml" filepath="$PROJECT_DIR$/Android-MaterialRefreshLayout-master/Android-MaterialRefreshLayout-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MaterialRefresh_library/MaterialRefresh_library.iml" filepath="$PROJECT_DIR$/MaterialRefresh_library/MaterialRefresh_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/MyApplication.iml" filepath="$PROJECT_DIR$/MyApplication.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/startallvideoplayer/startallvideoplayer.iml" filepath="$PROJECT_DIR$/startallvideoplayer/startallvideoplayer.iml" />

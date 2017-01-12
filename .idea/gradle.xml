@@ -9,6 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Android-MaterialRefreshLayout-master" />
+            <option value="$PROJECT_DIR$/MaterialRefresh_library" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/startallvideoplayer" />
             <option value="$PROJECT_DIR$/vitamio" />

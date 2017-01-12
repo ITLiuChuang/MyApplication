@@ -1,1 +1,1 @@
-include ':app', ':startallvideoplayer', ':vitamio', ':vitamio-sample', ':xutils', ':xUtils3-master'
+include ':app', ':startallvideoplayer', ':vitamio', ':vitamio-sample', ':xutils', ':xUtils3-master', ':MaterialRefresh_library', ':Android-MaterialRefreshLayout-master'

@@ -346,7 +346,7 @@ public class SystemVideoPlayerActivity extends Activity implements View.OnClickL
                     if (isNetUrl) {
                         int buffer = videoview.getBufferPercentage();
                         //缓存进度
-                        int secondaryProgress = buffer * seekBarVideo.getMax();
+                        int secondaryProgress = buffer * seekBarVideo.getMax() / 100;
                         seekBarVideo.setSecondaryProgress(secondaryProgress);
                     }
                     if (isNetUrl && videoview.isPlaying()) {

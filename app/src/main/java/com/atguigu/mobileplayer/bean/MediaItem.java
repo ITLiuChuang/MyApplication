@@ -13,6 +13,42 @@ public class MediaItem implements Serializable{
     String data;
     String artist;
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getHeightUrl() {
+        return heightUrl;
+    }
+
+    public void setHeightUrl(String heightUrl) {
+        this.heightUrl = heightUrl;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    /**
+     * 图片路径
+     */
+    String imageUrl;
+
+    /**
+     *描述
+     */
+    String desc;
+    String heightUrl;
+
+
     public String getArtist() {
         return artist;
     }
